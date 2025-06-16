@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เปียแชร์ครั้งนี้...เปียสู้(ดอกเบี้ย)เท่าไหร่ดี?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .main-card {
+            @apply bg-white p-6 md:p-8 rounded-xl shadow-lg;
+        }
+        .label {
+            @apply block text-gray-700 text-sm font-bold mb-2;
+        }
+        .input {
+            @apply shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500;
+        }
+        .btn {
+            @apply font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105;
+        }
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700 text-white w-full text-lg;
+        }
+        .btn-secondary {
+            @apply bg-gray-200 hover:bg-gray-300 text-gray-700;
+        }
+        .btn-danger-sm {
+             @apply bg-red-100 text-red-700 hover:bg-red-200 text-xs font-bold py-1 px-2 rounded-full;
+        }
+        #result-display {
+            display: none;
+        }
+        .fieldset-header {
+            @apply text-lg font-semibold px-2 text-white rounded-t-md;
+        }
+        .tab-btn {
+            @apply px-4 py-2 text-sm font-medium rounded-md;
+        }
+        .tab-btn.active {
+            @apply bg-blue-600 text-white;
+        }
+        .tab-btn:not(.active) {
+             @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="main-card w-full max-w-lg">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">เปียแชร์ครั้งนี้...สู้ดอกเบี้ยเท่าไหร่ดี?</h1>
+            <p class="text-gray-500 mt-1">เครื่องมือเปรียบเทียบความคุ้มค่า</p>
+        </div>
+
+        <!-- ส่วนที่ 1: ข้อมูลวงแชร์ -->
+        <fieldset class="border p-4 rounded-md mb-6">
+            <legend class="fieldset-header bg-gray-500">ขั้นตอนที่ 1: ข้อมูลวงแชร์ของคุณ</legend>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label class="label" for="total-pot">ยอดเงินกองกลางที่ต้องการ (บาท)</label>
+                    <input class="input" id="total-pot" type="number" placeholder="เช่น 60000">
+                </div>
+                 <div>
+                    <label class="label" for="total-installments">วงนี้เล่นทั้งหมดกี่งวด</label>
+                    <input class="input" id="total-installments" type="number" placeholder="เช่น 12">
+                </div>
+                 <div>
+                    <label class="label" for="current-installment">ตอนนี้เป็นงวดที่เท่าไหร่</label>
+                    <input class="input" id="current-installment" type="number" placeholder="เช่น 3">
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- ส่วนที่ 2: ทางเลือกสำรอง -->
+        <fieldset class="border p-4 rounded-md mb-6">
+            <legend class="fieldset-header bg-purple-600">ขั้นตอนที่ 2: ทางเลือกสำรองของคุณ</legend>
+            <div class="mt-4">
+                <p class="label">ถ้าไม่เปียตอนนี้ คุณจะไปหาเงินจากทางไหน?</p>
+                <div id="alternative-tabs" class="flex space-x-2 mb-4">
+                    <button class="tab-btn active" data-alt="card">บัตรกดเงินสด</button>
+                    <button class="tab-btn" data-alt="loan">เงินกู้อื่นๆ</button>
+                </div>
+                <div id="alternative-inputs">
+                    <div id="card-div">
+                        <label class="label text-sm" for="card-interest-rate">ดอกเบี้ยบัตรของคุณปีละกี่เปอร์เซ็นต์ (%)?</label>
+                        <input class="input" id="card-interest-rate" type="number" placeholder="เช่น 28">
+                    </div>
+                    <div id="loan-div" class="hidden">
+                        <label class="label text-sm" for="loan-interest-rate">ต้องเสียดอกเบี้ยเดือนละกี่เปอร์เซ็นต์ (%)?</label>
+                        <input class="input" id="loan-interest-rate" type="number" placeholder="เช่น 10">
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- ส่วนที่ 3: ข้อมูลการเปียครั้งก่อนๆ -->
+        <fieldset class="border p-4 rounded-md mb-6">
+            <legend class="fieldset-header bg-green-600">ขั้นตอนที่ 3: สถิติในวง (ถ้ามี)</legend>
+            <div id="previous-bids-list" class="space-y-3 mt-4">
+                <!-- Javascript จะเพิ่มรายการที่นี่ -->
+            </div>
+            <button id="add-previous-bid-btn" class="btn btn-secondary mt-4 w-full text-sm">
+                + เพิ่มยอดดอกเบี้ยครั้งก่อน
+            </button>
+        </fieldset>
+
+        <!-- ปุ่มคำนวณ -->
+        <div class="mt-8 mb-6">
+             <button id="calculate-btn" class="btn btn-primary">วิเคราะห์และให้คำแนะนำ</button>
+        </div>
+
+        <!-- ส่วนแสดงผลลัพธ์ -->
+        <div id="result-display" class="bg-gray-50 p-4 rounded-lg border">
+             <h3 class="font-bold text-lg mb-4 text-center">ผลการวิเคราะห์</h3>
+             <div id="analysis" class="text-sm text-gray-600 mb-4 p-3 bg-gray-100 rounded-md">
+                <!-- Analysis will be inserted here -->
+             </div>
+             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md">
+                <p class="text-sm text-gray-700">เพดานดอกเบี้ยสูงสุดที่แนะนำคือ:</p>
+                <p id="recommended-ceiling" class="text-3xl font-bold text-blue-600 my-1">1,833.33 บาท</p>
+            </div>
+            <div id="reasoning" class="text-sm text-gray-600 mt-3 p-3 bg-blue-50 rounded-md">
+                <!-- Reasoning will be inserted here -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let previousBidCount = 0;
+        const addPreviousBidBtn = document.getElementById('add-previous-bid-btn');
+        const previousBidsList = document.getElementById('previous-bids-list');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resultDisplay = document.getElementById('result-display');
+        const analysisEl = document.getElementById('analysis');
+        const recommendedCeilingEl = document.getElementById('recommended-ceiling');
+        const reasoningEl = document.getElementById('reasoning');
+        
+        const tabs = document.querySelectorAll('.tab-btn');
+        const tabContents = {
+            card: document.getElementById('card-div'),
+            loan: document.getElementById('loan-div'),
+        };
+        
+        const currencyFormatter = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        function addPreviousBidField() {
+            previousBidCount++;
+            const fieldDiv = document.createElement('div');
+            fieldDiv.classList.add('flex', 'items-center', 'gap-2');
+            fieldDiv.id = `previous-bid-field-${previousBidCount}`;
+            fieldDiv.innerHTML = `
+                <input class="input previous-bid-input" type="number" placeholder="ยอดดอกเบี้ยครั้งที่ ${previousBidCount}">
+                <button class="btn-danger-sm" onclick="removePreviousBidField(${previousBidCount})">ลบ</button>
+            `;
+            previousBidsList.appendChild(fieldDiv);
+        }
+
+        function removePreviousBidField(id) {
+            document.getElementById(`previous-bid-field-${id}`)?.remove();
+        }
+
+        function handleTabClick(e) {
+            const activeAlt = e.target.dataset.alt;
+            tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.alt === activeAlt));
+            Object.values(tabContents).forEach(content => content.classList.add('hidden'));
+            tabContents[activeAlt].classList.remove('hidden');
+        }
+
+        function calculateRecommendation() {
+            // --- 1. Get and Validate Basic Info ---
+            const totalPot = parseFloat(document.getElementById('total-pot').value);
+            const totalInstallments = parseInt(document.getElementById('total-installments').value);
+            const currentInstallment = parseInt(document.getElementById('current-installment').value);
+
+            if (isNaN(totalPot) || isNaN(totalInstallments) || isNaN(currentInstallment) || totalPot <= 0 || totalInstallments <= 0 || currentInstallment <= 0 || currentInstallment > totalInstallments) {
+                alert('กรุณากรอกข้อมูลวงแชร์ในขั้นตอนที่ 1 ให้ถูกต้อง');
+                return;
+            }
+            const remainingInstallments = totalInstallments - currentInstallment;
+
+            // --- 2. Calculate Monthly Cost of Alternative ---
+            let alternativeMonthlyCost = 0;
+            const activeTab = document.querySelector('.tab-btn.active').dataset.alt;
+            
+            if (activeTab === 'card') {
+                const rate = parseFloat(document.getElementById('card-interest-rate').value);
+                if (isNaN(rate) || rate <= 0) { alert('กรุณากรอกดอกเบี้ยบัตร'); return; }
+                alternativeMonthlyCost = totalPot * ((rate / 12) / 100);
+            } else if (activeTab === 'loan') {
+                const rate = parseFloat(document.getElementById('loan-interest-rate').value);
+                if (isNaN(rate) || rate <= 0) { alert('กรุณากรอกดอกเบี้ยเงินกู้'); return; }
+                alternativeMonthlyCost = totalPot * (rate / 100);
+            }
+            if (alternativeMonthlyCost === 0) {
+                 alert('กรุณากรอกข้อมูลทางเลือกสำรองของคุณให้ครบถ้วน');
+                 return;
+            }
+
+            // --- 3. Calculate Personal Max Bid Ceiling ---
+            // This is the total bid amount that, when spread out, equals the alternative monthly cost.
+            const personalCeiling = remainingInstallments > 0 ? alternativeMonthlyCost * remainingInstallments : alternativeMonthlyCost;
+
+            // --- 4. Calculate Market Ceiling (Average of previous bids) ---
+            let marketCeiling = Infinity;
+            const previousBids = [];
+            document.querySelectorAll('.previous-bid-input').forEach(input => {
+                const val = parseFloat(input.value);
+                if (!isNaN(val) && val > 0) previousBids.push(val);
+            });
+            if (previousBids.length > 0) {
+                const sum = previousBids.reduce((a, b) => a + b, 0);
+                marketCeiling = sum / previousBids.length;
+            }
+            
+            // --- 5. Determine Final Recommendation ---
+            const recommendation = Math.min(personalCeiling, marketCeiling);
+            
+            // --- 6. Build and Display Detailed Explanation ---
+            let analysisHtml = `<h4 class="font-bold mb-2">เปรียบเทียบต้นทุนของคุณ:</h4>`;
+            analysisHtml += `<div class="flex justify-between items-center"><span>1. ต้นทุนทางเลือกอื่น (ต่อเดือน):</span> <strong class="ml-2">${currencyFormatter.format(alternativeMonthlyCost)}</strong></div>`;
+            analysisHtml += `<p class="text-xs text-gray-500 pl-4 mb-2">- คือดอกเบี้ยที่คุณต้องจ่ายในแต่ละเดือนถ้าไปหาเงินจากแหล่งอื่น</p>`;
+            analysisHtml += `<div class="flex justify-between items-center"><span>2. ค่าเฉลี่ยของวง (ต้นทุนในวง):</span> <strong class="ml-2">${marketCeiling === Infinity ? 'N/A' : currencyFormatter.format(marketCeiling)}</strong></div>`;
+            analysisHtml += `<p class="text-xs text-gray-500 pl-4">- คือค่าเฉลี่ยของดอกเบี้ยที่คนในวงนี้เปียชนะกัน</p>`;
+            analysisEl.innerHTML = analysisHtml;
+
+            recommendedCeilingEl.textContent = currencyFormatter.format(recommendation);
+            
+            let reason = '';
+            const equivalentMonthlyBidCost = remainingInstallments > 0 ? recommendation / remainingInstallments : recommendation;
+
+            if (recommendation === personalCeiling && recommendation < marketCeiling) {
+                reason = `เราแนะนำให้ยึดตาม <strong>"เพดานส่วนตัว"</strong> ของคุณเป็นหลัก การเปียด้วยยอด <strong>${currencyFormatter.format(recommendation)}</strong> นี้ เมื่อหารเฉลี่ยกับ <strong>${remainingInstallments}</strong> งวดที่เหลือแล้ว จะเทียบเท่ากับคุณมีต้นทุนเฉลี่ยเดือนละ <strong>${currencyFormatter.format(equivalentMonthlyBidCost)}</strong> ซึ่งคุ้มค่ากว่าการไปเสียดอกเบี้ยจากทางเลือกอื่นครับ`;
+            } else if (recommendation === marketCeiling && recommendation < personalCeiling) {
+                reason = `เราแนะนำให้ยึดตาม <strong>"เพดานตลาด"</strong> ซึ่งเป็นค่าเฉลี่ยของวงนี้ การเปียด้วยยอด <strong>${currencyFormatter.format(recommendation)}</strong> จะทำให้คุณมีต้นทุนเฉลี่ยเดือนละ <strong>${currencyFormatter.format(equivalentMonthlyBidCost)}</strong> เท่านั้น ซึ่งถือว่าคุ้มค่ามาก เพราะถูกกว่าต้นทุนจากทางเลือกอื่นของคุณ (${currencyFormatter.format(alternativeMonthlyCost)} ต่อเดือน) อย่างชัดเจน`;
+            } else {
+                 reason = `เราแนะนำเพดานนี้โดยอิงจาก "ต้นทุนทางเลือกสำรอง" ของคุณเป็นหลัก การเปียด้วยยอด <strong>${currencyFormatter.format(recommendation)}</strong> นี้ เมื่อหารเฉลี่ยกับ <strong>${remainingInstallments}</strong> งวดที่เหลือ จะเท่ากับคุณมีต้นทุนเฉลี่ยเดือนละ <strong>${currencyFormatter.format(equivalentMonthlyBidCost)}</strong> ครับ`;
+            }
+            reasoningEl.innerHTML = `<p><strong class="text-blue-700">บทสรุปและคำแนะนำ:</strong> ${reason}</p>`;
+            
+            resultDisplay.style.display = 'block';
+        }
+
+        // --- Event Listeners ---
+        addPreviousBidBtn.addEventListener('click', addPreviousBidField);
+        tabs.forEach(tab => tab.addEventListener('click', handleTabClick));
+        calculateBtn.addEventListener('click', calculateRecommendation);
+
+        // --- Initial State ---
+        addPreviousBidField();
+    </script>
+</body>
+</html>
